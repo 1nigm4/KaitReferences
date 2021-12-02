@@ -1,33 +1,40 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Data;
+using System.Data.OleDb;
 using System.IO;
-using System.Threading.Tasks;
-using MsExcel = Microsoft.Office.Interop.Excel;
+using System.Linq;
+
 namespace KaitReference.Services
 {
-    static class Excel
+    public class Excel
     {
-        public static MsExcel.Application App;
-
-        static Excel()
+        public static List<string[]> Export()
         {
-            App = new MsExcel.Application();
-        }
-        public static IEnumerable<string[]> Export()
-        {
-            App.Workbooks.Open(@$"{Directory.GetCurrentDirectory()}\Data\Students.xlsx");
-            MsExcel.Worksheet sheet = (MsExcel.Worksheet)App.Worksheets.get_Item(1);
-            int columns = sheet.UsedRange.Columns.Count;
-            int rows = sheet.UsedRange.Rows.Count;
-
-            for (int i = 2; i <= rows; i++)
+            DataTable table = new DataTable();
+            using (OleDbConnection conn = new OleDbConnection())
             {
-                string data = string.Empty;
-                for (int j = 1; j <= columns; j++)
+                string filePath = $@"{Environment.CurrentDirectory}\Data\Students.xlsx";
+                string fileExtension = Path.GetExtension(filePath);
+                conn.ConnectionString = $"Provider=Microsoft.ACE.OLEDB.12.0;Data Source={filePath};Extended Properties='Excel 12.0 Xml;HDR=YES;'";
+                using (OleDbCommand db = new OleDbCommand())
                 {
-                    data += ((MsExcel.Range)sheet.Cells[i, j]).Value.ToString() + ";";
+                    db.CommandText = "Select * from [Реестр контингента$]";
+
+                    db.Connection = conn;
+
+                    using (OleDbDataAdapter da = new OleDbDataAdapter())
+                    {
+                        da.SelectCommand = db;
+                        da.Fill(table);
+                    }
                 }
-                yield return data.Split(';');
             }
+
+            List<string[]> result = new List<string[]>();
+            foreach (DataRow row in table.Rows)
+                result.Add(row.ItemArray.Cast<string>().ToArray());
+            return result;
         }
     }
 }

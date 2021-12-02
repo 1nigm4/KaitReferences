@@ -16,11 +16,5 @@ namespace KaitReference
                 e.Handled = true;
             };
         }
-
-        protected override void OnExit(ExitEventArgs e)
-        {
-            base.OnExit(e);
-            Excel.App.Quit();
-        }
     }
 }

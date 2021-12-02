@@ -15,6 +15,8 @@ namespace KaitReference.Models
         public DateTime EndDate { get; set; }
         public string Program { get; set; }
         public string Speciality { get; set; }
+        public string BaseSpeciality { get; set; }
+        public string BaseSpecialityCode { get; set; }
         public string SpecialityCode { get; set; }
         public string Form { get; set; }
         public int Period { get; set; }
