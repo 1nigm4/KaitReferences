@@ -154,18 +154,24 @@ namespace KaitReference.Services
             return (Convert.ToInt32(indexReference) + 1).ToString();
         }
 
+
+        private static List<IList<object>> specialityCodes;
         public static string[] GetBaseSpecialityCode(string specialityCode)
         {
-            string sheetName = sheetsService.Spreadsheets.Get(sheetId).Execute().Sheets[2].Properties.Title;
-            var request = sheetsService.Spreadsheets.Values.Get(sheetId, sheetName);
-            var sheet = request.Execute().Values;
-            string[] result = new string[2];
-            for (int i = 1; i < sheet.Count; i++)
+            if (specialityCodes == null)
             {
-                if (specialityCode.Split('.')[0] == sheet[i][1].ToString().Split('.')[0])
+                string sheetName = sheetsService.Spreadsheets.Get(sheetId).Execute().Sheets[2].Properties.Title;
+                var request = sheetsService.Spreadsheets.Values.Get(sheetId, sheetName);
+                specialityCodes = new List<IList<object>>(request.Execute().Values);
+            }
+            
+            string[] result = new string[2];
+            for (int i = 1; i < specialityCodes.Count; i++)
+            {
+                if (specialityCode.Split('.')[0] == specialityCodes[i][1].ToString().Split('.')[0])
                 {
-                    result[0] = sheet[i][1].ToString();
-                    result[1] = sheet[i][2].ToString();
+                    result[0] = specialityCodes[i][1].ToString();
+                    result[1] = specialityCodes[i][2].ToString();
                     break;
                 }
             }

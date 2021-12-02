@@ -53,16 +53,26 @@ namespace KaitReference.Services
             doc.Bookmarks["ДатаРождения"].Range.Text = $"{person.BirthDate.Year}";
             doc.Bookmarks["ДатаПриема"].Range.Text = $"{person.Education.AdmissionDate.Year}";
             doc.Bookmarks["УровеньОбразования"].Range.Text = person.Education.Base;
-            doc.Bookmarks["НомерПриказа"].Range.Text = person.Education.OrderNumber;
             doc.Bookmarks["Курс"].Range.Text = person.Education.Course.ToString();
             doc.Bookmarks["БазовыйКодСпециальности"].Range.Text = person.Education.BaseSpecialityCode;
             doc.Bookmarks["БазоваяСпециальность"].Range.Text = person.Education.BaseSpeciality;
-            doc.Bookmarks["ФормаОбучения"].Range.Text = person.Education.Form == "Очная" ? "очной" : person.Education.Form == "Заочная" ? "заочной" : "очно-заочной";
+            doc.Bookmarks["ФормаОбучения"].Range.Text = person.Education.Form.Contains("Очная") ? "очной" : person.Education.Form.Contains("Заочная") ? "заочной" : "очно-заочной";
+            doc.Bookmarks["ФормаОбучения1"].Range.Text = person.Education.Form.Contains("Очная") ? "очной" : person.Education.Form.Contains("Заочная") ? "заочной" : "очно-заочной";
             doc.Bookmarks["КодСпециальности"].Range.Text = person.Education.SpecialityCode;
             doc.Bookmarks["Специальность"].Range.Text = person.Education.Speciality;
             doc.Bookmarks["ДатаОкончания"].Range.Text = $"{person.Education.EndDate.Year}";
+            doc.Bookmarks["ПериодОбучения"].Range.Text = person.Education.Period == 3 ? "2 года 10 месяцев" : "3 года 10 месяцев";
             if (!word.Visible)
+            {
+                string saveFilePath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "\\Готовые справки";
+                if (!Directory.Exists(saveFilePath))
+                    Directory.CreateDirectory(saveFilePath);
+                doc.SaveAs2($"{saveFilePath}\\{person} {DateTime.Now.ToShortDateString()} - {GoogleSheets.GetLastReferenceIndex()}.docx", Word.WdSaveFormat.wdFormatDocumentDefault);
                 word.Quit();
+                MessageBox.Show($"Файл успешно сохранен в {saveFilePath}", "Информация",
+                    MessageBoxButton.OK, MessageBoxImage.Information);
+                GoogleSheets.AddReference(person);
+            }
         }
     }
 }
