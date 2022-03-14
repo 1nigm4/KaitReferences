@@ -42,6 +42,8 @@ namespace KaitReference.ViewModels
         {
             int index = Persons.IndexOf(SelectedPerson);
             GoogleSheets.SaveStatusChanges(index, SelectedPerson.Reference.Status);
+            if (SelectedPerson.Reference.Status.Contains("да"))
+                GoogleSheets.AddReference(SelectedPerson);
         }
         private bool CanSaveReferenceStatusCommandExecute(object p) => SelectedPerson != null && !string.IsNullOrWhiteSpace(SelectedPerson.Reference.Status);
         public ICommand SynchronizationCommand { get; }
@@ -51,7 +53,7 @@ namespace KaitReference.ViewModels
         private void OnUploadStudentsCommandExecuted(object p)
         {
             OpenFileDialog fileDialog = new OpenFileDialog();
-            fileDialog.Filter = "Excel Files 2007+ | *.xlsx | Excel Files 93-2000 | *.xls";
+            fileDialog.Filter = "Excel Files 93-2000|*.xls" + "|" + "Excel Files 2007+|*.xlsx";
             if (fileDialog.ShowDialog() == true)
             {
                 FileInfo data = new FileInfo(fileDialog.FileName);
@@ -63,8 +65,8 @@ namespace KaitReference.ViewModels
                     data = new FileInfo(workbook.FileName);
                 }
                 data.CopyTo(Environment.CurrentDirectory + "\\Data\\Students.xlsx", true);
+                Synchronization();
             }
-            Synchronization();
         }
         private bool CanUploadStudentsCommandExecute(object p) => true;
         #endregion
@@ -111,7 +113,7 @@ namespace KaitReference.ViewModels
                 person.Patronymic = data[2];
                 person.BirthDate = DateTime.Parse(data[3]);
                 person.Gender = data[4];
-                person.Education.Financing = data[5];
+                person.Education.Financing = data[5] == "Бюджет" ? "бюджетных ассигнований" : "средств юридических лиц";
                 person.Education.Group = data[6].Split('.')[0];
                 person.Education.Area = Regex.Matches(data[6], @"\d")[2].Value.Last() switch
                 {
@@ -120,8 +122,7 @@ namespace KaitReference.ViewModels
                     '3' => "авто",
                     '4' => "техно",
                     '5' => "бтм",
-                    '6' => "моссовет",
-                    _ => ""
+                    '6' => "моссовет"
                 };
                 person.Education.Course = data[7] == "I" ? 1 : data[7] == "II" ? 2 : data[7] == "III" ? 3 : 4;
                 person.Education.Status = data[8];
@@ -135,9 +136,15 @@ namespace KaitReference.ViewModels
                 string[] baseSpeciality = GoogleSheets.GetBaseSpecialityCode(data[15]);
                 person.Education.BaseSpeciality = baseSpeciality[1];
                 person.Education.BaseSpecialityCode = baseSpeciality[0];
-                person.Education.Form = data[16];
-                person.Education.Period = data[17].Contains("2г") ? 3 : 4;
-                int endDateYear = person.Education.AdmissionDate.Year + person.Education.Period;
+                person.Education.Form = data[16].Contains("Очная") ? "очной" : data[16].Contains("Заочная") ? "заочной" : "очно-заочной";
+                person.Education.Period = data[17];
+                int endDateYear = person.Education.AdmissionDate.Year + data[17] switch
+                {
+                    "10м" => 1,
+                    "3г 10м" => 4,
+                    "4г 10м" => 5,
+                    _ => 3 // 2г 4м и 2г 10м
+                };
                 person.Education.EndDate = DateTime.Parse($"30.06.{endDateYear}");
             });
         }

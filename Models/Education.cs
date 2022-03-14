@@ -19,7 +19,7 @@ namespace KaitReference.Models
         public string BaseSpecialityCode { get; set; }
         public string SpecialityCode { get; set; }
         public string Form { get; set; }
-        public int Period { get; set; }
+        public string Period { get; set; }
         public string Base { get; set; }
     }
 }
