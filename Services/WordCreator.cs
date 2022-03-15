@@ -51,6 +51,8 @@ namespace KaitReferences.Services
             doc.Bookmarks["Специальность"].Range.Text = person.Education.Speciality;
             doc.Bookmarks["ДатаОкончания"].Range.Text = $"{person.Education.EndDate.Year}";
             doc.Bookmarks["ПериодОбучения"].Range.Text = person.Education.Period;
+            doc.Bookmarks["ДатаВыдачи"].Range.Text = DateTime.Now.ToShortDateString();
+            doc.Bookmarks["НомерВыдачи"].Range.Text = GoogleSheets.GetLastReferenceIndex();
             SaveFile(word, doc, person);
         }
 

@@ -30,13 +30,39 @@ namespace KaitReferences.ViewModels
             set => Set(ref selectedPerson, value);
         }
 
+        private string errorReason;
+        public string ErrorReason
+        {
+            get => errorReason;
+            set => Set(ref errorReason, value);
+        }
+
         #region Commands
         public ICommand CreateReferenceCommand { get; }
         private void OnCreateReferenceCommandExecuted(object p) => WordCreator.CreateReference(SelectedPerson);
-        private bool CanCreateReferenceCommandExecute(object p) => SelectedPerson != null && SelectedPerson.Education.OrderNumber != null;
+        private bool CanCreateReferenceCommandExecute(object p)
+        {
+            if (SelectedPerson?.Education?.Status is null or "В академическом отпуске")
+            {
+                ErrorReason = SelectedPerson?.Education?.Status ?? "Нет в базе";
+                return false;
+            }
+
+            ErrorReason = string.Empty;
+            return true;
+        }
         public ICommand CreateRectalCommand { get; }
         private void OnCreateRectalCommandExecuted(object p) => WordCreator.CreateRectal(SelectedPerson);
-        private bool CanCreateRectalCommandExecute(object p) => SelectedPerson != null && SelectedPerson.Gender == "Мужской";
+        private bool CanCreateRectalCommandExecute(object p)
+        {
+            if (SelectedPerson == null || SelectedPerson.Gender != "Мужской") return false;
+            if (SelectedPerson.Education.Form == "заочной")
+            {
+                ErrorReason = "Заочник";
+                return false;
+            }
+            return CanCreateReferenceCommandExecute(null);
+        }
         public ICommand SaveReferenceStatusCommand { get; }
         private void OnSaveReferenceStatusCommandExecuted(object p)
         {
@@ -106,7 +132,6 @@ namespace KaitReferences.ViewModels
             {
                 string[] data = table.Find(d => person.LastName.Contains(d[0]) & person.Name.Contains(d[1]) & person.Patronymic.Contains(d[2]));
                 if (data == null) return;
-                if (!data[8].Contains("Обучается")) return; // If person education status not in process => skip
 
                 person.LastName = data[0];
                 person.Name = data[1];
