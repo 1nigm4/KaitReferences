@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel;
 using System.Runtime.CompilerServices;
 
-namespace KaitReference.ViewModels.Base
+namespace KaitReferences.ViewModels.Base
 {
     public abstract class ViewModel : INotifyPropertyChanged
     {

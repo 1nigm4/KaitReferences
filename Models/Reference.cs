@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace KaitReference.Models
+namespace KaitReferences.Models
 {
     class Reference
     {

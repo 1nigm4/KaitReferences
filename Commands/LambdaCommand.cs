@@ -1,7 +1,7 @@
-﻿using KaitReference.Commands.Base;
+﻿using KaitReferences.Commands.Base;
 using System;
 
-namespace KaitReference.Commands
+namespace KaitReferences.Commands
 {
     internal class LambdaCommand : Command
     {

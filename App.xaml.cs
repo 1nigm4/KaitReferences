@@ -1,7 +1,6 @@
-﻿using KaitReference.Services;
-using System.Windows;
+﻿using System.Windows;
 
-namespace KaitReference
+namespace KaitReferences
 {
     public partial class App : Application
     {

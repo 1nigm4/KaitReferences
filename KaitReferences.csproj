@@ -7,8 +7,8 @@
     <ApplicationIcon>Resources\Icon.ico</ApplicationIcon>
     <AssemblyVersion>1.0.0</AssemblyVersion>
     <FileVersion>1.0.0</FileVersion>
-    <Authors>1nigm4, DennimiCode</Authors>
-    <Company>CAIT20</Company>
+    <Authors>1nigm4</Authors>
+    <Company>KAIT20</Company>
   </PropertyGroup>
 
   <ItemGroup>

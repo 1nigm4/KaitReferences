@@ -1,10 +1,10 @@
-﻿using KaitReference.Models;
+﻿using KaitReferences.Models;
 using System;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 
-namespace KaitReference.Views.Windows
+namespace KaitReferences.Views.Windows
 {
     public partial class MainWindow : Window
     {

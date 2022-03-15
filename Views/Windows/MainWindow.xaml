@@ -1,13 +1,13 @@
-﻿<Window x:Class="KaitReference.Views.Windows.MainWindow"
+﻿<Window x:Class="KaitReferences.Views.Windows.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:vm="clr-namespace:KaitReference.ViewModels"
-        xmlns:local="clr-namespace:KaitReference"
+        xmlns:vm="clr-namespace:KaitReferences.ViewModels"
+        xmlns:local="clr-namespace:KaitReferences"
         xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes"
         mc:Ignorable="d"
-        Title="КАИТ20 | Выдача справок" Height="900" Width="1024" WindowStartupLocation="CenterScreen">
+        Title="КАИТ20 | Выдача справок" Height="900" Width="1024" WindowStartupLocation="CenterScreen" WindowState="Maximized">
     <Window.DataContext>
         <vm:MainWindowViewModel/>
     </Window.DataContext>

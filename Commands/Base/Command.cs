@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Windows.Input;
 
-namespace KaitReference.Commands.Base
+namespace KaitReferences.Commands.Base
 {
     internal abstract class Command : ICommand
     {

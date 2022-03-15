@@ -1,11 +1,11 @@
-﻿using KaitReference.Models;
-using KaitReference.Views.Windows;
+﻿using KaitReferences.Models;
+using KaitReferences.Views.Windows;
 using Word = Microsoft.Office.Interop.Word;
 using System;
 using System.IO;
 using System.Windows;
 
-namespace KaitReference.Services
+namespace KaitReferences.Services
 {
     class WordCreator
     {

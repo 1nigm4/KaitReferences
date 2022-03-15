@@ -1,7 +1,7 @@
-﻿using KaitReference.Commands;
-using KaitReference.Models;
-using KaitReference.Services;
-using KaitReference.ViewModels.Base;
+﻿using KaitReferences.Commands;
+using KaitReferences.Models;
+using KaitReferences.Services;
+using KaitReferences.ViewModels.Base;
 using Microsoft.Win32;
 using Spire.Xls;
 using System;
@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 
-namespace KaitReference.ViewModels
+namespace KaitReferences.ViewModels
 {
     class MainWindowViewModel : ViewModel
     {

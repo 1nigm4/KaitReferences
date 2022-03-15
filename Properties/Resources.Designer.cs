@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace KaitReference.Properties {
+namespace KaitReferences.Properties {
     using System;
     
     
@@ -39,7 +39,7 @@ namespace KaitReference.Properties {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("KaitReference.Properties.Resources", typeof(Resources).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("KaitReferences.Properties.Resources", typeof(Resources).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -61,7 +61,7 @@ namespace KaitReference.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на KaitReference.
+        ///   Ищет локализованную строку, похожую на KaitReferences.
         /// </summary>
         internal static string AppName {
             get {

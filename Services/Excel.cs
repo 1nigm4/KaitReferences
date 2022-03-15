@@ -5,10 +5,11 @@ using System.Data.OleDb;
 using System.IO;
 using System.Linq;
 
-namespace KaitReference.Services
+namespace KaitReferences.Services
 {
     public class Excel
     {
+        const string COLUMNS = "`Фамилия`, `Имя`, `Отчество`, `Дата рождения`, `Пол`, `Финансирование (средства обучения)`, `Учебная группа`, `Курс обучения`, `Статус`, `Базовое образование`, `Номер приказа о зачислении`, `Дата приказа о зачислении`, `Дата приема`, `Программа обучения`, `Профессия/специальность`, `Код профессии/специальности`, `Форма обучения`, `Срок обучения`";
         public static List<string[]> Export()
         {
             DataTable table = new DataTable();
@@ -19,7 +20,7 @@ namespace KaitReference.Services
                 conn.ConnectionString = $"Provider=Microsoft.ACE.OLEDB.12.0;Data Source={filePath};Extended Properties='Excel 12.0 Xml;HDR=YES;'";
                 using (OleDbCommand db = new OleDbCommand())
                 {
-                    db.CommandText = "Select * from [Реестр контингента$]";
+                    db.CommandText = $"Select {COLUMNS} from [Реестр контингента$]";
 
                     db.Connection = conn;
 
@@ -31,6 +32,7 @@ namespace KaitReference.Services
                 }
             }
 
+            var asd = table.Columns;
             List<string[]> result = new List<string[]>();
             foreach (DataRow row in table.Rows)
                 result.Add(row.ItemArray.Cast<string>().ToArray());

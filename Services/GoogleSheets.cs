@@ -4,13 +4,13 @@ using Google.Apis.Services;
 using Google.Apis.Sheets.v4;
 using Google.Apis.Sheets.v4.Data;
 using Google.Apis.Util.Store;
-using KaitReference.Models;
+using KaitReferences.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 
-namespace KaitReference.Services
+namespace KaitReferences.Services
 {
     class GoogleSheets
     {
