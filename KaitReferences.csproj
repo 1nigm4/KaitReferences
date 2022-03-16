@@ -44,6 +44,7 @@
   <ItemGroup>
     <PackageReference Include="FreeSpire.XLS" Version="11.8.6" />
     <PackageReference Include="Google.Apis.Drive.v3" Version="1.55.0.2502" />
+    <PackageReference Include="Google.Apis.PeopleService.v1" Version="1.56.0.2616" />
     <PackageReference Include="Google.Apis.Sheets.v4" Version="1.55.0.2371" />
     <PackageReference Include="MaterialDesignThemes" Version="4.2.1" />
     <PackageReference Include="System.Data.OleDb" Version="6.0.0" />

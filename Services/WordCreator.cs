@@ -30,6 +30,7 @@ namespace KaitReferences.Services
             doc.Bookmarks["Площадка"].Range.Text = person.Education.Area;
             doc.Bookmarks["ДатаВыдачи"].Range.Text = DateTime.Now.ToShortDateString();
             doc.Bookmarks["НомерВыдачи"].Range.Text = GoogleSheets.GetLastReferenceIndex(person);
+            doc.Bookmarks["Исполнитель"].Range.Text = GoogleSheets.Executor;
             SaveFile(word, doc, person);
         }
 

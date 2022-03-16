@@ -1,5 +1,6 @@
 ﻿using Google.Apis.Auth.OAuth2;
 using Google.Apis.Drive.v3;
+using Google.Apis.PeopleService.v1;
 using Google.Apis.Services;
 using Google.Apis.Sheets.v4;
 using Google.Apis.Sheets.v4.Data;
@@ -14,6 +15,7 @@ namespace KaitReferences.Services
 {
     class GoogleSheets
     {
+        public static string Executor;
         private static SheetsService sheetsService;
         private static readonly string appName;
         private static readonly string clientId;
@@ -31,7 +33,7 @@ namespace KaitReferences.Services
 
         public static bool Connect()
         {
-            string[] scopes = new string[] { DriveService.Scope.Drive, SheetsService.Scope.Spreadsheets };
+            string[] scopes = new string[] { DriveService.Scope.Drive, SheetsService.Scope.Spreadsheets, PeopleServiceService.Scope.UserinfoProfile };
             UserCredential credentials = GoogleWebAuthorizationBroker.AuthorizeAsync(new ClientSecrets
             {
                 ClientId = clientId,
@@ -51,8 +53,20 @@ namespace KaitReferences.Services
                 ApplicationName = appName
             });
 
-            var request = driveService.Files.List();
-            var response = request.Execute();
+            PeopleServiceService peopleService = new PeopleServiceService(new BaseClientService.Initializer
+            {
+                HttpClientInitializer = credentials
+            });
+
+            var peopleRequest = peopleService.People.Get("people/me");
+            peopleRequest.PersonFields = "names";
+            var person = peopleRequest.Execute();
+            string familyName = person.Names[0].FamilyName;
+            string[] givenName = person.Names[0].GivenName.Split();
+            Executor = $"{familyName} {givenName[0][0]}.{givenName[1][0]}.";
+
+            var driveRequest = driveService.Files.List();
+            var response = driveRequest.Execute();
 
             sheetId = response.Files.FirstOrDefault(f => f.Name == sheetName)?.Id;
 
