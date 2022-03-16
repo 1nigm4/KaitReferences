@@ -29,7 +29,7 @@ namespace KaitReferences.Services
             doc.Bookmarks["Назначение"].Range.Text = person.Reference.Assignment;
             doc.Bookmarks["Площадка"].Range.Text = person.Education.Area;
             doc.Bookmarks["ДатаВыдачи"].Range.Text = DateTime.Now.ToShortDateString();
-            doc.Bookmarks["НомерВыдачи"].Range.Text = GoogleSheets.GetLastReferenceIndex();
+            doc.Bookmarks["НомерВыдачи"].Range.Text = GoogleSheets.GetLastReferenceIndex(person);
             SaveFile(word, doc, person);
         }
 
@@ -52,7 +52,7 @@ namespace KaitReferences.Services
             doc.Bookmarks["ДатаОкончания"].Range.Text = $"{person.Education.EndDate.Year}";
             doc.Bookmarks["ПериодОбучения"].Range.Text = person.Education.Period;
             doc.Bookmarks["ДатаВыдачи"].Range.Text = DateTime.Now.ToShortDateString();
-            doc.Bookmarks["НомерВыдачи"].Range.Text = GoogleSheets.GetLastReferenceIndex();
+            doc.Bookmarks["НомерВыдачи"].Range.Text = GoogleSheets.GetLastReferenceIndex(person);
             SaveFile(word, doc, person);
         }
 
@@ -63,7 +63,7 @@ namespace KaitReferences.Services
                 string saveFilePath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "\\Готовые справки";
                 if (!Directory.Exists(saveFilePath))
                     Directory.CreateDirectory(saveFilePath);
-                doc.SaveAs2($"{saveFilePath}\\{person} {DateTime.Now.ToShortDateString()} - {GoogleSheets.GetLastReferenceIndex()}.docx", Word.WdSaveFormat.wdFormatDocumentDefault);
+                doc.SaveAs2($"{saveFilePath}\\{person} {DateTime.Now.ToShortDateString()} - {GoogleSheets.GetLastReferenceIndex(person)}.docx", Word.WdSaveFormat.wdFormatDocumentDefault);
                 word.Quit();
                 MessageBox.Show($"Файл успешно сохранен в {saveFilePath}", "Информация",
                     MessageBoxButton.OK, MessageBoxImage.Information);

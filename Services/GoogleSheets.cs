@@ -119,7 +119,8 @@ namespace KaitReferences.Services
         }
         public static void AddReference(Person person)
         {
-            string sheetName = sheetsService.Spreadsheets.Get(sheetId).Execute().Sheets[1].Properties.Title;
+            int sheetIndex = person.Reference.Assignment == "В военный комиссариат" ? 2 : 1;
+            string sheetName = sheetsService.Spreadsheets.Get(sheetId).Execute().Sheets[sheetIndex].Properties.Title;
 
             var request = sheetsService.Spreadsheets.Values.Get(sheetId, sheetName);
             int index = request.Execute().Values.Count + 1;
@@ -131,12 +132,12 @@ namespace KaitReferences.Services
                 {
                     new List<object>()
                     {
-                        GetLastReferenceIndex(),
+                        GetLastReferenceIndex(person),
                         DateTime.Now.ToShortDateString(),
                         person.LastName,
                         person.Name,
                         person.Patronymic,
-                        "Об обучении"
+                        person.Reference.Assignment == "В военный комиссариат" ? "В военный комиссариат" : "Об обучении"
                     }
                 }
             };
@@ -145,9 +146,10 @@ namespace KaitReferences.Services
             appendRequest.Execute();
         }
 
-        public static string GetLastReferenceIndex()
+        public static string GetLastReferenceIndex(Person person)
         {
-            string sheetName = sheetsService.Spreadsheets.Get(sheetId).Execute().Sheets[1].Properties.Title;
+            int sheetIndex = person.Reference.Assignment == "В военный комиссариат" ? 2 : 1;
+            string sheetName = sheetsService.Spreadsheets.Get(sheetId).Execute().Sheets[sheetIndex].Properties.Title;
             var request = sheetsService.Spreadsheets.Values.Get(sheetId, sheetName);
             var sheet = request.Execute().Values;
             var indexReference = sheet.Last()[0].ToString().All(char.IsNumber) ? sheet.Last()[0] : default(int);
