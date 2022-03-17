@@ -163,13 +163,17 @@ namespace KaitReferences.ViewModels
                 person.Education.BaseSpecialityCode = baseSpeciality[0];
                 person.Education.Form = data[16].Contains("Очная") ? "очной" : data[16].Contains("Заочная") ? "заочной" : "очно-заочной";
                 person.Education.Period = data[17];
-                int endDateYear = person.Education.AdmissionDate.Year + data[17] switch
+                int period = data[17] switch
                 {
                     "10м" => 1,
                     "3г 10м" => 4,
                     "4г 10м" => 5,
                     _ => 3 // 2г 4м и 2г 10м
                 };
+
+                DateTime date = DateTime.Now;
+                int halfYear = date.Month < 9 ? 0 : 1; 
+                int endDateYear = date.Year + (period - person.Education.Course) + halfYear;
                 person.Education.EndDate = DateTime.Parse($"30.06.{endDateYear}");
             });
         }
