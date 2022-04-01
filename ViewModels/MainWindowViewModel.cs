@@ -138,7 +138,7 @@ namespace KaitReferences.ViewModels
                 person.Patronymic = data[2];
                 person.BirthDate = DateTime.Parse(data[3]);
                 person.Gender = data[4];
-                person.Education.Financing = data[5] == "Бюджет" ? "бюджетных ассигнований" : "средств юридических лиц";
+                person.Education.Financing = data[5] == "Бюджет" ? "бюджетных ассигнований" : "средств физических лиц";
                 person.Education.Group = data[6].Split('.')[0];
                 person.Education.Area = Regex.Matches(data[6], @"\d")[2].Value.Last() switch
                 {

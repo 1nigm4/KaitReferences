@@ -25,12 +25,13 @@ namespace KaitReferences.Services
             doc.Bookmarks["ПрограммаОбучения"].Range.Text = person.Education.Program;
             doc.Bookmarks["Специальность"].Range.Text = person.Education.Speciality;
             doc.Bookmarks["Финансирование"].Range.Text = person.Education.Financing;
+            doc.Bookmarks["ПериодОбучения"].Range.Text = person.Education.Period;
             doc.Bookmarks["ДатаОкончания"].Range.Text = person.Education.EndDate.ToShortDateString();
             doc.Bookmarks["Назначение"].Range.Text = person.Reference.Assignment;
-            doc.Bookmarks["Площадка"].Range.Text = person.Education.Area;
             doc.Bookmarks["ДатаВыдачи"].Range.Text = DateTime.Now.ToShortDateString();
             doc.Bookmarks["НомерВыдачи"].Range.Text = GoogleSheets.GetLastReferenceIndex(person);
             doc.Bookmarks["Исполнитель"].Range.Text = GoogleSheets.Executor;
+            doc.Bookmarks["Площадка"].Range.Text = person.Education.Area;
             SaveFile(word, doc, person);
         }
 
@@ -54,6 +55,8 @@ namespace KaitReferences.Services
             doc.Bookmarks["ПериодОбучения"].Range.Text = person.Education.Period;
             doc.Bookmarks["ДатаВыдачи"].Range.Text = DateTime.Now.ToShortDateString();
             doc.Bookmarks["НомерВыдачи"].Range.Text = GoogleSheets.GetLastReferenceIndex(person);
+            doc.Bookmarks["Исполнитель"].Range.Text = GoogleSheets.Executor;
+            doc.Bookmarks["Площадка"].Range.Text = person.Education.Area;
             SaveFile(word, doc, person);
         }
 
