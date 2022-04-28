@@ -18,6 +18,7 @@ namespace KaitReferences.Services
             doc.Bookmarks["ДатаРождения"].Range.Text = person.BirthDate.ToShortDateString();
             doc.Bookmarks["Курс"].Range.Text = person.Education.Course.ToString();
             doc.Bookmarks["ФормаОбучения"].Range.Text = person.Education.Form;
+            doc.Bookmarks["Подготовка"].Range.Text = person.Education.Program == "Профессия" ? "квалифицированных рабочих, служащих" : "специалистов среднего звена";
             doc.Bookmarks["НомерПриказа"].Range.Text = person.Education.OrderNumber;
             doc.Bookmarks["ДатаПриказа"].Range.Text = person.Education.OrderDate.ToShortDateString();
             doc.Bookmarks["ДатаПриема"].Range.Text = person.Education.AdmissionDate.ToShortDateString();
@@ -48,6 +49,7 @@ namespace KaitReferences.Services
             doc.Bookmarks["БазовыйКодСпециальности"].Range.Text = person.Education.BaseSpecialityCode;
             doc.Bookmarks["БазоваяСпециальность"].Range.Text = person.Education.BaseSpeciality;
             doc.Bookmarks["ФормаОбучения"].Range.Text = person.Education.Form;
+            doc.Bookmarks["ПрограммаОбучения"].Range.Text = person.Education.Program == "Профессия" ? "профессии" : "специальности";
             doc.Bookmarks["ФормаОбучения1"].Range.Text = person.Education.Form;
             doc.Bookmarks["КодСпециальности"].Range.Text = person.Education.SpecialityCode;
             doc.Bookmarks["Специальность"].Range.Text = person.Education.Speciality;
