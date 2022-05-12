@@ -35,7 +35,8 @@ namespace KaitReferences.Services
             var asd = table.Columns;
             List<string[]> result = new List<string[]>();
             foreach (DataRow row in table.Rows)
-                result.Add(row.ItemArray.Cast<string>().ToArray());
+                if (row.ItemArray[0] is string)
+                    result.Add(row.ItemArray.Cast<string>().ToArray());
             return result;
         }
     }
