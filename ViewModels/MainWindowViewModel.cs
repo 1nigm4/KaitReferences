@@ -55,7 +55,7 @@ namespace KaitReferences.ViewModels
         private void OnCreateRectalCommandExecuted(object p) => WordCreator.CreateRectal(SelectedPerson);
         private bool CanCreateRectalCommandExecute(object p)
         {
-            if (SelectedPerson == null || SelectedPerson.Gender != "Мужской") return false;
+            if (SelectedPerson == null || SelectedPerson.Gender is not ("Мужской" or "м.")) return false;
             if (SelectedPerson.Education.Form == "заочной")
             {
                 ErrorReason = "Заочник";
@@ -79,7 +79,7 @@ namespace KaitReferences.ViewModels
         private void OnUploadStudentsCommandExecuted(object p)
         {
             OpenFileDialog fileDialog = new OpenFileDialog();
-            fileDialog.Filter = "Excel Files 93-2000|*.xls" + "|" + "Excel Files 2007+|*.xlsx";
+            fileDialog.Filter = "Excel Files 2007+|*.xlsx" + "|" + "Excel Files 93-2000|*.xls";
             if (fileDialog.ShowDialog() == true)
             {
                 FileInfo data = new FileInfo(fileDialog.FileName);
@@ -99,7 +99,7 @@ namespace KaitReferences.ViewModels
 
         public MainWindowViewModel()
         {
-            connect: // Trying to connect to Google Sheets
+        connect: // Trying to connect to Google Sheets
             var isConnected = GoogleSheets.Connect();
             if (!isConnected)
             {
@@ -122,6 +122,7 @@ namespace KaitReferences.ViewModels
         {
             SelectedPerson = null;
             Persons = GoogleSheets.ExportReferences();
+            Persons.Reverse();
             await Task.Run(() => GetMoreInformation());
         }
 
@@ -130,7 +131,7 @@ namespace KaitReferences.ViewModels
             List<string[]> table = Excel.Export();
             Parallel.ForEach(Persons, new ParallelOptions { MaxDegreeOfParallelism = -1 }, person =>
             {
-                string[] data = table.Find(d => person.LastName.Contains(d[0]) & person.Name.Contains(d[1]) & person.Patronymic.Contains(d[2]));
+                string[] data = table.Find(d => PersonWithGroup(person, d) || PersonWithFIO(person, d));
                 if (data == null) return;
 
                 person.LastName = data[0];
@@ -149,7 +150,15 @@ namespace KaitReferences.ViewModels
                     '5' => "бтм",
                     '6' => "моссовет"
                 };
-                person.Education.Course = data[7] == "I" ? 1 : data[7] == "II" ? 2 : data[7] == "III" ? 3 : 4;
+                person.Education.Course = data[7] switch
+                {
+                    "I" => 1,
+                    "II" => 2,
+                    "III" => 3,
+                    "IV" => 4,
+                    "V" => 5,
+                    _ => int.Parse(data[7].Split()[0])
+                };
                 person.Education.Status = data[8];
                 person.Education.Base = data[9];
                 person.Education.OrderNumber = data[10];
@@ -172,10 +181,19 @@ namespace KaitReferences.ViewModels
                 };
 
                 DateTime date = DateTime.Now;
-                int halfYear = date.Month < 9 ? 0 : 1; 
+                int halfYear = date.Month < 9 ? 0 : 1;
                 int endDateYear = date.Year + (period - person.Education.Course) + halfYear;
                 person.Education.EndDate = DateTime.Parse($"30.06.{endDateYear}");
             });
         }
+
+        private bool PersonWithFIO(Person person, string[] aisPerson) =>
+            person.LastName.Contains(aisPerson[0]) &&
+            person.Name.Contains(aisPerson[1]) &&
+            person.Patronymic.Contains(aisPerson[2]);
+
+        private bool PersonWithGroup(Person person, string[] aisPerson) =>
+            PersonWithFIO(person, aisPerson) &&
+            aisPerson[6].ToLower().Contains(person.Education.Group.ToLower());
     }
 }

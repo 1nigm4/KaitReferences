@@ -1,7 +1,8 @@
-﻿using System;
+﻿using Microsoft.Office.Interop.Word;
+using OfficeOpenXml;
+using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Data.OleDb;
 using System.IO;
 using System.Linq;
 
@@ -10,34 +11,30 @@ namespace KaitReferences.Services
     public class Excel
     {
         const string COLUMNS = "`Фамилия`, `Имя`, `Отчество`, `Дата рождения`, `Пол`, `Финансирование (средства обучения)`, `Учебная группа`, `Курс обучения`, `Статус`, `Базовое образование`, `Номер приказа о зачислении`, `Дата приказа о зачислении`, `Дата приема`, `Программа обучения`, `Профессия/специальность`, `Код профессии/специальности`, `Форма обучения`, `Срок обучения`";
+        
+        static Excel()
+        {
+            ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+        }
+        
         public static List<string[]> Export()
         {
-            DataTable table = new DataTable();
-            using (OleDbConnection conn = new OleDbConnection())
+            string excelPath = Path.Combine(Environment.CurrentDirectory, @"Data\Students.xlsx");
+            using (var package = new ExcelPackage(new FileInfo(excelPath)))
             {
-                string filePath = $@"{Environment.CurrentDirectory}\Data\Students.xlsx";
-                string fileExtension = Path.GetExtension(filePath);
-                conn.ConnectionString = $"Provider=Microsoft.ACE.OLEDB.12.0;Data Source={filePath};Extended Properties='Excel 12.0 Xml;HDR=YES;'";
-                using (OleDbCommand db = new OleDbCommand())
-                {
-                    db.CommandText = $"Select {COLUMNS} from [Реестр контингента$]";
+                var sheet = package.Workbook.Worksheets.First();
+                var rows = sheet.Cells.Where(cell => cell != null)
+                    .GroupBy(cell => cell.EntireRow.StartRow)
+                    .Where(row => row.FirstOrDefault().Value != null)
+                    .Select(row => row.Where(cell => COLUMNS.Contains(cell.EntireColumn.Range.Text))
+                        .DistinctBy(cell => cell.EntireColumn.Range.Text)
+                        .Select(cell => cell.Value.ToString())
+                        .ToArray())
+                    .Skip(1)
+                    .ToList();
 
-                    db.Connection = conn;
-
-                    using (OleDbDataAdapter da = new OleDbDataAdapter())
-                    {
-                        da.SelectCommand = db;
-                        da.Fill(table);
-                    }
-                }
+                return rows;
             }
-
-            var asd = table.Columns;
-            List<string[]> result = new List<string[]>();
-            foreach (DataRow row in table.Rows)
-                if (row.ItemArray[0] is string)
-                    result.Add(row.ItemArray.Cast<string>().ToArray());
-            return result;
         }
     }
 }

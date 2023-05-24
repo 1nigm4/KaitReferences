@@ -2,7 +2,7 @@
 
 namespace KaitReferences.Models
 {
-    class Reference
+    public class Reference
     {
         public DateTime Date { get; set; }
         public string Type { get; set; }
@@ -12,5 +12,6 @@ namespace KaitReferences.Models
         public string Form { get; set; }
         public string Note { get; set; }
         public string Status { get; set; }
+        public ReferenceType ReferenceType { get; set; }
     }
 }

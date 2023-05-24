@@ -48,7 +48,7 @@
         <DataGrid Grid.Row="1" ItemsSource="{Binding Source={StaticResource PersonsCollection}}" SelectedItem="{Binding SelectedPerson}" AutoGenerateColumns="False" IsReadOnly="True">
             <DataGrid.Columns>
                 <DataGridTextColumn Header="Отметка времени" Binding="{Binding Reference.Date, StringFormat=dd.MM.yyyy HH:mm:ss}"/>
-                <DataGridTextColumn Header="Исполнено" Binding="{Binding Reference.Status}"/>
+                <DataGridTextColumn Header="Исполнено" Binding="{Binding Reference.Status}" Width="250"/>
                 <DataGridTextColumn Header="Учебное отделение" Binding="{Binding Education.Area}"/>
                 <DataGridTextColumn Header="Фамилия" Binding="{Binding LastName}"/>
                 <DataGridTextColumn Header="Имя" Binding="{Binding Name}"/>

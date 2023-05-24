@@ -33,6 +33,8 @@ namespace KaitReferences.Services
             doc.Bookmarks["НомерВыдачи"].Range.Text = GoogleSheets.GetLastReferenceIndex(person);
             doc.Bookmarks["Исполнитель"].Range.Text = GoogleSheets.Executor;
             doc.Bookmarks["Площадка"].Range.Text = person.Education.Area;
+
+            person.Reference.ReferenceType = ReferenceType.Reference;
             SaveFile(word, doc, person);
         }
 
@@ -59,6 +61,8 @@ namespace KaitReferences.Services
             doc.Bookmarks["НомерВыдачи"].Range.Text = GoogleSheets.GetLastReferenceIndex(person);
             doc.Bookmarks["Исполнитель"].Range.Text = GoogleSheets.Executor;
             doc.Bookmarks["Площадка"].Range.Text = person.Education.Area;
+
+            person.Reference.ReferenceType = ReferenceType.Rectal;
             SaveFile(word, doc, person);
         }
 

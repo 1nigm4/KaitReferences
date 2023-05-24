@@ -21,7 +21,11 @@ namespace KaitReferences.Services
         private static readonly string clientId;
         private static readonly string clientSecret;
         private static string sheetName;
-        private static string sheetId;
+        private static string spreadSheetId;
+        private static int? referenceJournalId = 1618961239;
+        private static int? rectalJournalId = 102128820;
+        private static int? directionsId = 1755638865;
+        private static List<IList<object>> specialityCodes;
 
         static GoogleSheets()
         {
@@ -68,11 +72,11 @@ namespace KaitReferences.Services
             var driveRequest = driveService.Files.List();
             var response = driveRequest.Execute();
 
-            sheetId = response.Files.FirstOrDefault(f => f.Name == sheetName)?.Id;
+            spreadSheetId = response.Files.FirstOrDefault(f => f.Name == sheetName)?.Id;
 
-            if (string.IsNullOrEmpty(sheetId)) return false;
+            if (string.IsNullOrEmpty(spreadSheetId)) return false;
 
-            var sheetRequest = sheetsService.Spreadsheets.Get(sheetId);
+            var sheetRequest = sheetsService.Spreadsheets.Get(spreadSheetId);
             var sheetResponse = sheetRequest.Execute();
 
             sheetName = sheetResponse.Sheets[0].Properties.Title;
@@ -82,10 +86,10 @@ namespace KaitReferences.Services
 
         public static List<Person> ExportReferences()
         {
-            var request = sheetsService.Spreadsheets.Values.Get(sheetId, sheetName);
+            var request = sheetsService.Spreadsheets.Values.Get(spreadSheetId, sheetName);
             var sheet = request.Execute().Values;
             List<Person> references = new List<Person>();
-            for (int n = 2; n < sheet.Count; n++)
+            for (int n = 1; n < sheet.Count; n++)
             {
                 var reference = sheet[n];
                 while (reference.Count < 17) reference.Add(string.Empty); // Google sheets skiping last cells without info
@@ -104,14 +108,14 @@ namespace KaitReferences.Services
                     },
                     Reference = new Reference()
                     {
-                        Date = DateTime.Parse((string) reference[0]),
-                        Type = ((string) reference[7]).Split()[0],
-                        Count = int.Parse((string) reference[8]),
-                        Assignment = (string) reference[9],
-                        Period = (string) reference[10],
-                        Form = (string) reference[11],
-                        Note = (string) reference[14],
-                        Status = (string) reference[16]
+                        Date = DateTime.Parse((string)reference[0]),
+                        Type = ((string)reference[7]).Split()[0],
+                        Count = int.Parse((string)reference[8]),
+                        Assignment = (string)reference[9],
+                        Period = (string)reference[10],
+                        Form = (string)reference[11],
+                        Note = (string)reference[14],
+                        Status = (string)reference[16]
                     }
                 };
                 references.Add(person);
@@ -127,16 +131,14 @@ namespace KaitReferences.Services
             ValueRange data = new ValueRange();
             data.Values = new List<IList<object>>() { new List<object>() { value } };
 
-            var request = sheetsService.Spreadsheets.Values.Update(data, sheetId, range);
+            var request = sheetsService.Spreadsheets.Values.Update(data, spreadSheetId, range);
             request.ValueInputOption = SpreadsheetsResource.ValuesResource.UpdateRequest.ValueInputOptionEnum.USERENTERED;
             request.Execute();
         }
         public static void AddReference(Person person)
         {
-            int sheetIndex = person.Reference.Assignment == "В военный комиссариат" ? 2 : 1;
-            string sheetName = sheetsService.Spreadsheets.Get(sheetId).Execute().Sheets[sheetIndex].Properties.Title;
-
-            var request = sheetsService.Spreadsheets.Values.Get(sheetId, sheetName);
+            string sheetName = GetSheetName(person.Reference);
+            var request = sheetsService.Spreadsheets.Values.Get(spreadSheetId, sheetName);
             int index = request.Execute().Values.Count + 1;
 
             var range = sheetName + $"!A{index}:F{index}"; // 'A' column with number of reference; 'F' is last column with note
@@ -155,29 +157,39 @@ namespace KaitReferences.Services
                     }
                 }
             };
-            var appendRequest = sheetsService.Spreadsheets.Values.Append(data, sheetId, range);
+            var appendRequest = sheetsService.Spreadsheets.Values.Append(data, spreadSheetId, range);
             appendRequest.ValueInputOption = SpreadsheetsResource.ValuesResource.AppendRequest.ValueInputOptionEnum.USERENTERED;
             appendRequest.Execute();
         }
 
         public static string GetLastReferenceIndex(Person person)
         {
-            int sheetIndex = person.Reference.Assignment == "В военный комиссариат" ? 2 : 1;
-            string sheetName = sheetsService.Spreadsheets.Get(sheetId).Execute().Sheets[sheetIndex].Properties.Title;
-            var request = sheetsService.Spreadsheets.Values.Get(sheetId, sheetName);
+            string sheetName = GetSheetName(person.Reference);
+            var request = sheetsService.Spreadsheets.Values.Get(spreadSheetId, sheetName);
             var sheet = request.Execute().Values;
             var indexReference = sheet.Last()[0].ToString().All(char.IsNumber) ? sheet.Last()[0] : default(int);
             return (Convert.ToInt32(indexReference) + 1).ToString();
         }
 
+        private static string GetSheetName(Reference reference)
+        {
+            int? sheetId = reference.ReferenceType == ReferenceType.Rectal || reference.Assignment == "В военный комиссариат" ? rectalJournalId : referenceJournalId;
+            string sheetName = sheetsService.Spreadsheets
+                .Get(spreadSheetId)
+                .Execute()
+                .Sheets.First(s => s.Properties.SheetId == sheetId || s.Properties.Title == (sheetId == rectalJournalId ? "Журнал ВК" : "Журнал справок")).Properties.Title;
+            return sheetName;
+        }
 
-        private static List<IList<object>> specialityCodes;
         public static string[] GetBaseSpecialityCode(string specialityCode)
         {
             if (specialityCodes == null)
             {
-                string sheetName = sheetsService.Spreadsheets.Get(sheetId).Execute().Sheets[2].Properties.Title;
-                var request = sheetsService.Spreadsheets.Values.Get(sheetId, sheetName);
+                string sheetName = sheetsService.Spreadsheets
+                    .Get(spreadSheetId)
+                    .Execute().Sheets
+                    .First(s => s.Properties.SheetId == directionsId || s.Properties.Title == "Направления").Properties.Title;
+                var request = sheetsService.Spreadsheets.Values.Get(spreadSheetId, sheetName);
                 specialityCodes = new List<IList<object>>(request.Execute().Values);
             }
             
