@@ -118,6 +118,7 @@ namespace KaitReferences.Services
                         Status = (string)reference[16]
                     }
                 };
+                
                 references.Add(person);
             }
             return references;

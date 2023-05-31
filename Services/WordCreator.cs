@@ -19,7 +19,7 @@ namespace KaitReferences.Services
             doc.Bookmarks["Курс"].Range.Text = person.Education.Course.ToString();
             doc.Bookmarks["ФормаОбучения"].Range.Text = person.Education.Form;
             doc.Bookmarks["Подготовка"].Range.Text = person.Education.Program == "Профессия" ? "квалифицированных рабочих, служащих" : "специалистов среднего звена";
-            doc.Bookmarks["НомерПриказа"].Range.Text = person.Education.OrderNumber;
+            doc.Bookmarks["НомерПриказа"].Range.Text = person.Education.OrderNumber.Split("/")[0] + "/лу";
             doc.Bookmarks["ДатаПриказа"].Range.Text = person.Education.OrderDate.ToShortDateString();
             doc.Bookmarks["ДатаПриема"].Range.Text = person.Education.AdmissionDate.ToShortDateString();
             doc.Bookmarks["КодСпециальности"].Range.Text = person.Education.SpecialityCode;

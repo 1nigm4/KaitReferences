@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.IO;
 using System.Linq;
+using System.Windows;
 
 namespace KaitReferences.Services
 {
@@ -20,20 +21,28 @@ namespace KaitReferences.Services
         public static List<string[]> Export()
         {
             string excelPath = Path.Combine(Environment.CurrentDirectory, @"Data\Students.xlsx");
-            using (var package = new ExcelPackage(new FileInfo(excelPath)))
+            try
             {
-                var sheet = package.Workbook.Worksheets.First();
-                var rows = sheet.Cells.Where(cell => cell != null)
-                    .GroupBy(cell => cell.EntireRow.StartRow)
-                    .Where(row => row.FirstOrDefault().Value != null)
-                    .Select(row => row.Where(cell => COLUMNS.Contains(cell.EntireColumn.Range.Text))
-                        .DistinctBy(cell => cell.EntireColumn.Range.Text)
-                        .Select(cell => cell.Value.ToString())
-                        .ToArray())
-                    .Skip(1)
-                    .ToList();
+                using (var package = new ExcelPackage(new FileInfo(excelPath)))
+                {
+                    var sheet = package.Workbook.Worksheets.First();
+                    var rows = sheet.Cells.Where(cell => cell != null)
+                        .GroupBy(cell => cell.EntireRow.StartRow)
+                        .Where(row => row.FirstOrDefault().Value != null)
+                        .Select(row => row.Where(cell => COLUMNS.Contains(cell.EntireColumn.Range.Text))
+                            .DistinctBy(cell => cell.EntireColumn.Range.Text)
+                            .Select(cell => cell.Value.ToString())
+                            .ToArray())
+                        .Skip(1)
+                        .ToList();
 
-                return rows;
+                    return rows;
+                }
+            }
+            catch (InvalidOperationException e)
+            {
+                MessageBox.Show("Необходимо загрузить базу АИС", "Экспорт данных");
+                return null;
             }
         }
     }

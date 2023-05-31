@@ -129,9 +129,15 @@ namespace KaitReferences.ViewModels
         private void GetMoreInformation()
         {
             List<string[]> table = Excel.Export();
+            if (table == null) return;
+
             Parallel.ForEach(Persons, new ParallelOptions { MaxDegreeOfParallelism = -1 }, person =>
             {
-                string[] data = table.Find(d => PersonWithGroup(person, d) || PersonWithFIO(person, d));
+                if (person.Reference.Date.Day == 19 && person.Reference.Date.Hour == 10)
+                {
+                    _ = person;
+                }
+                string[] data = table.Find(d => PersonWithGroup(person, d));
                 if (data == null) return;
 
                 person.LastName = data[0];
