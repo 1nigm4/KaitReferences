@@ -5,6 +5,7 @@ namespace KaitReferences.Models
     class Person
     {
         public string EmailAddress { get; set; }
+        public string FIO => $"{LastName.Trim()} {Name.Trim()} {Patronymic.Trim()}";
         public string LastName { get; set; }
         public string Name { get; set; }
         public string Patronymic { get; set; }
@@ -17,7 +18,7 @@ namespace KaitReferences.Models
 
         public override string ToString()
         {
-            return $"{LastName} {Name} {Patronymic}";
+            return FIO;
         }
     }
 }

@@ -133,73 +133,89 @@ namespace KaitReferences.ViewModels
 
             Parallel.ForEach(Persons, new ParallelOptions { MaxDegreeOfParallelism = -1 }, person =>
             {
-                if (person.Reference.Date.Day == 19 && person.Reference.Date.Hour == 10)
-                {
-                    _ = person;
-                }
                 string[] data = table.Find(d => PersonWithGroup(person, d));
                 if (data == null) return;
 
-                person.LastName = data[0];
-                person.Name = data[1];
-                person.Patronymic = data[2];
-                person.BirthDate = DateTime.Parse(data[3]);
-                person.Gender = data[4];
-                person.Education.Financing = data[5] == "Бюджет" ? "бюджетных ассигнований" : "средств физических лиц";
-                person.Education.Group = data[6].Split('.')[0];
-                person.Education.Area = Regex.Matches(data[6], @"\d")[2].Value.Last() switch
-                {
-                    '1' => "юниор",
-                    '2' => "1М",
-                    '3' => "авто",
-                    '4' => "техно",
-                    '5' => "бтм",
-                    '6' => "моссовет"
-                };
-                person.Education.Course = data[7] switch
-                {
-                    "I" => 1,
-                    "II" => 2,
-                    "III" => 3,
-                    "IV" => 4,
-                    "V" => 5,
-                    _ => int.Parse(data[7].Split()[0])
-                };
-                person.Education.Status = data[8];
-                person.Education.Base = data[9];
-                person.Education.OrderNumber = data[10];
-                person.Education.OrderDate = DateTime.Parse(data[11]);
-                person.Education.AdmissionDate = DateTime.Parse(data[12]);
-                person.Education.Program = data[13].Contains("ППССЗ") ? "Специальность" : "Профессия";
-                person.Education.Speciality = data[14];
-                person.Education.SpecialityCode = data[15];
-                string[] baseSpeciality = GoogleSheets.GetBaseSpecialityCode(data[15]);
+                string[] fio = GetFIO(data[0]);
+                person.LastName = fio[0];
+                person.Name = fio[1];
+                person.Patronymic = fio[2];
+                person.BirthDate = DateTime.Parse(data[1]);
+                person.Gender = data[2];
+                person.Education.Status = data[3];
+                person.Education.Financing = data[4] == "Бюджет" ? "бюджетных ассигнований" : "средств физических лиц";
+                person.Education.Group = data[5].Split('.')[0];
+                person.Education.Area = GetArea(data[5]);
+                int course = int.Parse(data[6].Split()[0]);
+                person.Education.Course = course;
+                person.Education.OrderNumber = data[7];
+                person.Education.OrderDate = DateTime.Parse(data[8]);
+                person.Education.AdmissionDate = DateTime.Parse(data[9]);
+                person.Education.Program = data[10].Contains("ППССЗ") ? "Специальность" : "Профессия";
+                person.Education.Speciality = data[11];
+                person.Education.SpecialityCode = data[12];
+                string[] baseSpeciality = GoogleSheets.GetBaseSpecialityCode(data[12]);
                 person.Education.BaseSpeciality = baseSpeciality[1];
                 person.Education.BaseSpecialityCode = baseSpeciality[0];
-                person.Education.Form = data[16].Contains("Очная") ? "очной" : data[16].Contains("Заочная") ? "заочной" : "очно-заочной";
-                person.Education.Period = data[17];
-                int period = data[17] switch
-                {
-                    "10м" => 1,
-                    "3г 10м" => 4,
-                    "4г 10м" => 5,
-                    _ => 3 // 2г 4м и 2г 10м
-                };
-
-                DateTime date = DateTime.Now;
-                int halfYear = date.Month < 9 ? 0 : 1;
-                int endDateYear = date.Year + (period - person.Education.Course) + halfYear;
-                person.Education.EndDate = DateTime.Parse($"30.06.{endDateYear}");
+                person.Education.Form = data[13].Contains("Очная") ? "очной" : data[16].Contains("Заочная") ? "заочной" : "очно-заочной";
+                string period = data[14];
+                person.Education.Period = period;
+                person.Education.EndDate = GetEndDate(period, course);
+                person.Education.Base = data[15];
             });
         }
 
-        private bool PersonWithFIO(Person person, string[] aisPerson) =>
-            person.LastName.Contains(aisPerson[0]) &&
-            person.Name.Contains(aisPerson[1]) &&
-            person.Patronymic.Contains(aisPerson[2]);
+        private string GetArea(string area)
+        {
+            return Regex.Matches(area, @"\d")[2].Value.Last() switch
+            {
+                '1' => "датахаб",
+                '2' => "диджитал",
+                '3' => "авто",
+                '4' => "техно",
+                '5' => "кибер",
+                '6' => "моссовет"
+            };
+        }
+
+        private DateTime GetEndDate(string periodDate, int course)
+        {
+            int period = periodDate switch
+            {
+                "10м" => 1,
+                "3г 10м" => 4,
+                "4г 10м" => 5,
+                _ => 3 // 2г 4м и 2г 10м
+            };
+
+            DateTime date = DateTime.Now;
+            int halfYear = date.Month < 9 ? 0 : 1;
+            int endDateYear = date.Year + (period - course) + halfYear;
+            return DateTime.Parse($"30.06.{endDateYear}");
+        }
+
+        private bool PersonWithFIO(Person person, string[] aisPerson)
+        {
+            if (person.FIO == "Монахов Андрей Антонович" || aisPerson[0] == "Монахов Андрей Антонович")
+                _ = 1;
+            return aisPerson[0] == person.FIO;
+        }
+            
 
         private bool PersonWithGroup(Person person, string[] aisPerson) =>
             PersonWithFIO(person, aisPerson) &&
-            aisPerson[6].ToLower().Contains(person.Education.Group.ToLower());
+            aisPerson[5].ToLower().Contains(person.Education.Group.ToLower());
+
+        private string[] GetFIO(string FIO)
+        {
+            string[] fio = FIO.Split();
+
+            string lastName = fio[0];
+            string firstName = fio[1];
+            string patronymic = string.Join(" ", fio.Skip(2))
+                .Replace("-", string.Empty);
+
+            return new string[] { lastName, firstName, patronymic };
+        }
     }
 }
