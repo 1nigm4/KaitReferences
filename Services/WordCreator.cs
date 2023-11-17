@@ -1,82 +1,97 @@
-﻿using KaitReferences.Models;
-using KaitReferences.Views.Windows;
-using Word = Microsoft.Office.Interop.Word;
+﻿using KaitReferences.Extensions;
+using KaitReferences.Models;
 using System;
+using System.Diagnostics;
 using System.IO;
 using System.Windows;
+using Xceed.Document.NET;
+using Xceed.Words.NET;
 
 namespace KaitReferences.Services
 {
     class WordCreator
     {
+        static string _DIRECTORY = Directory.GetCurrentDirectory();
+
         public static void CreateReference(Person person)
         {
-            Word.Application word = new Word.Application();
-            word.Visible = (bool)MainWindow.WordVisible.IsChecked;
-            Word.Document doc = word.Documents.Add($@"{Directory.GetCurrentDirectory()}\Data\Templates\Reference.docx");
-            doc.Bookmarks["ФИО"].Range.Text = person.ToString();
-            doc.Bookmarks["ДатаРождения"].Range.Text = person.BirthDate.ToShortDateString();
-            doc.Bookmarks["Курс"].Range.Text = person.Education.Course.ToString();
-            doc.Bookmarks["ФормаОбучения"].Range.Text = person.Education.Form;
-            doc.Bookmarks["Подготовка"].Range.Text = person.Education.Program == "Профессия" ? "квалифицированных рабочих, служащих" : "специалистов среднего звена";
-            doc.Bookmarks["НомерПриказа"].Range.Text = person.Education.OrderNumber.Split("/")[0] + "/лу";
-            doc.Bookmarks["ДатаПриказа"].Range.Text = person.Education.OrderDate.ToShortDateString();
-            doc.Bookmarks["ДатаПриема"].Range.Text = person.Education.AdmissionDate.ToShortDateString();
-            doc.Bookmarks["КодСпециальности"].Range.Text = person.Education.SpecialityCode;
-            doc.Bookmarks["ПрограммаОбучения"].Range.Text = person.Education.Program;
-            doc.Bookmarks["Специальность"].Range.Text = person.Education.Speciality;
-            doc.Bookmarks["Финансирование"].Range.Text = person.Education.Financing;
-            doc.Bookmarks["ПериодОбучения"].Range.Text = person.Education.Period;
-            doc.Bookmarks["ДатаОкончания"].Range.Text = person.Education.EndDate.ToShortDateString();
-            doc.Bookmarks["Назначение"].Range.Text = person.Reference.Assignment;
-            doc.Bookmarks["ДатаВыдачи"].Range.Text = DateTime.Now.ToShortDateString();
-            doc.Bookmarks["НомерВыдачи"].Range.Text = GoogleSheets.GetLastReferenceIndex(person);
-            doc.Bookmarks["Исполнитель"].Range.Text = GoogleSheets.Executor;
-            doc.Bookmarks["Площадка"].Range.Text = person.Education.Area;
-
             person.Reference.ReferenceType = ReferenceType.Reference;
-            SaveFile(word, doc, person);
+            string program = person.Education.Program == "Профессия" ? "квалифицированных рабочих, служащих" : "специалистов среднего звена";
+            string number = person.Education.OrderNumber.Split("/")[0] + "/лу";
+
+            using (var document = DocX.Load(@$"{_DIRECTORY}\Data\Templates\Reference.docx"))
+            {
+                document.WithUnderline(false);
+                document.SetText("ФИО", person.FIO);
+                document.SetText("ДатаРождения", $"{person.BirthDate:d}");
+                document.SetText("Курс", $"{person.Education.Course}");
+                document.SetText("ФормаОбучения", person.Education.Form);
+                document.SetText("Подготовка", program);
+                document.SetText("НомерПриказа", number);
+                document.SetText("ДатаПриказа", $"{person.Education.OrderDate:d}");
+                document.SetText("ДатаПриема", $"{person.Education.AdmissionDate:d}");
+                document.SetText("КодСпециальности", person.Education.SpecialityCode);
+                document.SetText("ПрограммаОбучения", person.Education.Program);
+                document.SetText("Специальность", person.Education.Speciality);
+                document.SetText("Финансирование", person.Education.Financing);
+                document.SetText("ПериодОбучения", person.Education.Period);
+                document.SetText("ДатаОкончания", $"{person.Education.EndDate:d}");
+                document.SetText("Назначение", person.Reference.Assignment);
+                document.SetText("ДатаВыдачи", $"{DateTime.Now:d}");
+                document.SetText("НомерВыдачи", GoogleSheets.GetLastReferenceIndex(person));
+                document.SetText("Исполнитель", GoogleSheets.Executor);
+                document.SetText("Площадка", person.Education.Area);
+                SaveFile(document, person);
+            }
         }
 
         public static void CreateRectal(Person person)
         {
-            Word.Application word = new Word.Application();
-            word.Visible = (bool)MainWindow.WordVisible.IsChecked;
-            Word.Document doc = word.Documents.Add($@"{Directory.GetCurrentDirectory()}\Data\Templates\Rectal.docx");
-            doc.Bookmarks["ФИО"].Range.Text = person.ToString();
-            doc.Bookmarks["ДатаРождения"].Range.Text = $"{person.BirthDate.Year}";
-            doc.Bookmarks["ДатаПриема"].Range.Text = $"{person.Education.AdmissionDate.Year}";
-            doc.Bookmarks["УровеньОбразования"].Range.Text = person.Education.Base;
-            doc.Bookmarks["Курс"].Range.Text = person.Education.Course.ToString();
-            doc.Bookmarks["БазовыйКодСпециальности"].Range.Text = person.Education.BaseSpecialityCode;
-            doc.Bookmarks["БазоваяСпециальность"].Range.Text = person.Education.BaseSpeciality;
-            doc.Bookmarks["ФормаОбучения"].Range.Text = person.Education.Form;
-            doc.Bookmarks["ПрограммаОбучения"].Range.Text = person.Education.Program == "Профессия" ? "профессии" : "специальности";
-            doc.Bookmarks["ФормаОбучения1"].Range.Text = person.Education.Form;
-            doc.Bookmarks["КодСпециальности"].Range.Text = person.Education.SpecialityCode;
-            doc.Bookmarks["Специальность"].Range.Text = person.Education.Speciality;
-            doc.Bookmarks["ДатаОкончания"].Range.Text = $"{person.Education.EndDate.Year}";
-            doc.Bookmarks["ПериодОбучения"].Range.Text = person.Education.Period;
-            doc.Bookmarks["ДатаВыдачи"].Range.Text = DateTime.Now.ToShortDateString();
-            doc.Bookmarks["НомерВыдачи"].Range.Text = GoogleSheets.GetLastReferenceIndex(person);
-            doc.Bookmarks["Исполнитель"].Range.Text = GoogleSheets.Executor;
-            doc.Bookmarks["Площадка"].Range.Text = person.Education.Area;
-
             person.Reference.ReferenceType = ReferenceType.Rectal;
-            SaveFile(word, doc, person);
+            string program = person.Education.Program == "Профессия" ? "профессии" : "специальности";
+
+            using (var document = DocX.Load(@$"{_DIRECTORY}\Data\Templates\Rectal.docx"))
+            {
+                document.WithUnderline(true);
+                document.SetText("ФИО", person.FIO);
+                document.SetText("ДатаРождения", $"{person.BirthDate.Year}");
+                document.SetText("ДатаПриема", $"{person.Education.AdmissionDate.Year}");
+                document.SetText("УровеньОбразования", person.Education.Base);
+                document.SetText("Курс", $"{person.Education.Course}");
+                document.SetText("БазовыйКодСпециальности", person.Education.BaseSpecialityCode);
+                document.SetText("БазоваяСпециальность", person.Education.BaseSpeciality);
+                document.SetText("ФормаОбучения", person.Education.Form);
+                document.SetText("ПрограммаОбучения", program);
+                document.SetText("ФормаОбучения1", person.Education.Form);
+                document.SetText("КодСпециальности", person.Education.SpecialityCode);
+                document.SetText("Специальность", person.Education.Speciality);
+                document.SetText("ДатаОкончания", $"{person.Education.EndDate.Year}");
+                document.SetText("ПериодОбучения", person.Education.Period);
+                document.SetText("ДатаВыдачи", $"{DateTime.Now:d}");
+                document.SetText("НомерВыдачи", GoogleSheets.GetLastReferenceIndex(person));
+                document.SetText("Исполнитель", GoogleSheets.Executor);
+                document.SetText("Площадка", person.Education.Area);
+                SaveFile(document, person);
+            }
         }
 
-        private static void SaveFile(Word.Application word, Word.Document doc, Person person)
+        private static void SaveFile(DocX document, Person person)
         {
-            if (!word.Visible)
+            string folderPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "\\Готовые справки";
+            if (!Directory.Exists(folderPath))
+                Directory.CreateDirectory(folderPath);
+
+            string filePath = $"{folderPath}\\{person} {DateTime.Now.ToShortDateString()} - {GoogleSheets.GetLastReferenceIndex(person)}.docx";
+            document.SaveAs(filePath);
+            MessageBoxResult result = MessageBox.Show($"Справка успешно сохранена по пути {folderPath}. Открыть справку?", "Информация",
+                MessageBoxButton.YesNo, MessageBoxImage.Information);
+
+            if (result == MessageBoxResult.Yes)
             {
-                string saveFilePath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "\\Готовые справки";
-                if (!Directory.Exists(saveFilePath))
-                    Directory.CreateDirectory(saveFilePath);
-                doc.SaveAs2($"{saveFilePath}\\{person} {DateTime.Now.ToShortDateString()} - {GoogleSheets.GetLastReferenceIndex(person)}.docx", Word.WdSaveFormat.wdFormatDocumentDefault);
-                word.Quit();
-                MessageBox.Show($"Файл успешно сохранен в {saveFilePath}", "Информация",
-                    MessageBoxButton.OK, MessageBoxImage.Information);
+                Process process = new Process();
+                process.StartInfo.FileName = filePath;
+                process.StartInfo.UseShellExecute = true;
+                process.Start();
             }
         }
     }

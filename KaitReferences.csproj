@@ -21,14 +21,13 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="DocX" Version="2.5.0" />
     <PackageReference Include="EPPlus" Version="6.2.4" />
     <PackageReference Include="FreeSpire.XLS" Version="11.8.6" />
     <PackageReference Include="Google.Apis.Drive.v3" Version="1.55.0.2502" />
     <PackageReference Include="Google.Apis.PeopleService.v1" Version="1.56.0.2616" />
     <PackageReference Include="Google.Apis.Sheets.v4" Version="1.55.0.2371" />
     <PackageReference Include="MaterialDesignThemes" Version="4.2.1" />
-    <PackageReference Include="Microsoft.Office.Interop.Excel" Version="15.0.4795.1001" />
-    <PackageReference Include="Microsoft.Office.Interop.Word" Version="15.0.4797.1004" />
     <PackageReference Include="System.Data.OleDb" Version="6.0.0" />
   </ItemGroup>
 
